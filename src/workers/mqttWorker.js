@@ -11,21 +11,33 @@ const prisma = new PrismaClient();
 const mqttUrl = process.env.MQTT_BROKER_URL || 'mqtt://localhost:1883';
 const client = mqtt.connect(mqttUrl);
 
-// Subscription to the sensor/suhu_udara topic
+// List of sensor topics
+const topics = [
+    "sensor/suhu_udara",
+    "sensor/kelembaban_udara",
+    "sensor/UV",
+    "sensor/O2",
+    "sensor/CO2",
+    "sensor/pH",
+    "sensor/suhu_media",
+    "sensor/kelembaban_media"
+];
+
+// Subscription to sensor topics
 client.on('connect', () => {
     console.log('Connected to MQTT Broker');
-    client.subscribe('sensor/suhu_udara', (err) => {
+    client.subscribe(topics, (err) => {
         if (err) {
-            console.error('Error subscribing to topic:', err);
+            console.error('Error subscribing to topics:', err);
         } else {
-            console.log('Subscribed to topic sensor/suhu_udara');
+            console.log('Subscribed to topics:', topics);
         }
     });
 });
 
-// Listen to messages on the topic
+// Listen to messages on the topics
 client.on('message', async (topic, message) => {
-    if (topic === 'sensor/suhu_udara') {
+    if (topics.includes(topic)) {
         try {
             const value = parseFloat(message.toString());
 
@@ -43,7 +55,7 @@ client.on('message', async (topic, message) => {
             // Check if the sensor exists in the database
             let sensor = await prisma.sensor.findFirst({
                 where: {
-                    name: 'sensor/suhu_udara', // Nama sensor yang ingin dicari
+                    name: topic, // Nama sensor yang ingin dicari berdasarkan topic
                 },
             });
 

@@ -79,9 +79,9 @@ enum Role {
 model Sensor {
     id          Int          @id @default(autoincrement())
     name        String
+    unit      String
     description String?
     location    String
-    types       TypeSensor[]
     createdAt   DateTime     @default(now())
     updatedAt   DateTime     @updatedAt
     kumbungId   Int
@@ -114,17 +114,6 @@ enum Activity {
     FADE_OUT
     BRIGHTNESS_UP
     BRIGHTNESS_DOWN
-}
-
-enum TypeSensor {
-    AIR_TEMPERATURE
-    MEDIA_TEMPERATURE
-    AIR_HUMIDITY
-    MEDIA_HUMIDITY
-    CO2_LEVEL
-    O2_LEVEL
-    UV_INDEX
-    PH
 }
 
 model Payment {

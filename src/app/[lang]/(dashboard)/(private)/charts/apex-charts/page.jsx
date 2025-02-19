@@ -7,8 +7,9 @@ import Typography from '@mui/material/Typography'
 
 // Component Imports
 import ApexBarChart from '@views/charts/apex/ApexBarChart'
-import ApexAreaChart from '@views/charts/apex/ApexAreaChart'
+
 import ApexLineChart from '@views/charts/apex/ApexLineChart'
+import ApexAreaChart from '@views/charts/apex/ApexAreaChart'
 import ApexRadarChart from '@views/charts/apex/ApexRadarChart'
 import ApexDonutChart from '@views/charts/apex/ApexDonutChart'
 import ApexColumnChart from '@views/charts/apex/ApexColumnChart'
@@ -21,8 +22,8 @@ const ApexCharts = () => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <Typography variant='h4'>ApexCharts</Typography>
-        <Typography>
+        <Typography variant='h4'>Stream</Typography>
+        {/* <Typography>
           <code>react-apexcharts</code> is a third-party library. Please refer to its{' '}
           <Link
             href='https://apexcharts.com'
@@ -33,40 +34,31 @@ const ApexCharts = () => {
             official documentation
           </Link>{' '}
           for more details.
-        </Typography>
+        </Typography> */}
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart />
+        <ApexAreaChart sensorName={'Suhu Udara'} sensorTopic={'sensor/suhu_udara'} chartColor='warning' chartMin={0} chartMax={100} />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart />
-      </Grid>
-      <Grid item xs={12}>
-        <ApexColumnChart />
-      </Grid>
-      <Grid item xs={12}>
-        <ApexScatterChart />
-      </Grid>
-      <Grid item xs={12}>
-        <ApexLineChart />
+        <ApexAreaChart sensorName={'Suhu Media'} sensorTopic={'sensor/suhu_media'} chartColor='error' chartMin={0} chartMax={100}/>
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexBarChart />
+        <ApexAreaChart sensorName={'Kelembaban Udara'} sensorTopic={'sensor/kelembaban_udara'} chartColor='info' chartMin={0} chartMax={100}/>
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexCandlestickChart />
+        <ApexAreaChart sensorName={'Kelembaban Media'} sensorTopic={'sensor/kelembaban_media'} chartColor='primary' chartMin={0} chartMax={100}/>
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexHeatmapChart />
+        <ApexAreaChart sensorName={'O2'} sensorTopic={'sensor/O2'} chartColor='success' chartMin={0} chartMax={100}/>
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexRadialBarChart />
+        <ApexAreaChart sensorName={'CO2'} sensorTopic={'sensor/CO2'} chartColor='secondary' chartMin={0} chartMax={10000}/>
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexRadarChart />
+        <ApexAreaChart sensorName={'UV'} sensorTopic={'sensor/UV'} chartColor='primary' chartMin={0} chartMax={11}/>
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexDonutChart />
+        <ApexAreaChart sensorName={'pH'} sensorTopic={'sensor/pH'} chartColor='info' chartMin={0} chartMax={10}/>
       </Grid>
     </Grid>
   )

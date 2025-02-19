@@ -12,23 +12,28 @@ import Box from '@mui/material/Box'
 // Import komponen chart secara dinamis
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
-const ApexTemperatureChart = () => {
+const ApexAreaChart = ({ sensorName, sensorTopic, chartColor, chartMin, chartMax }) => {
   const theme = useTheme()
+
+  // Vars
+  const infoColor = theme.palette[chartColor].main
 
   const divider = 'var(--mui-palette-divider)'
   const textDisabled = 'var(--mui-palette-text-disabled)'
 
   // State untuk menyimpan data chart dan nilai temperatur terbaru
-  const [chartSeries, setChartSeries] = useState([{ name: 'Suhu', data: [] }])
+  const [chartSeries, setChartSeries] = useState([{ name: '', data: [] }])
   const [chartCategories, setChartCategories] = useState([])
   const [currentTime, setCurrentTime] = useState('')
-  const [currentTemp, setCurrentTemp] = useState(null)
+  const [currentValue, setCurrentValue] = useState(null)
+  const [currentUnit, setCurrentUnit] = useState(null)
 
   // Ambil data dari API endpoint setiap 500ms
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch('/api/sensors?name=sensor/suhu_udara')
+        // Gunakan prop sensorName secara dinamis
+        const res = await fetch(`/api/sensors?name=${sensorTopic}`)
         const result = await res.json()
         let dataList = result.dataList
 
@@ -37,21 +42,23 @@ const ApexTemperatureChart = () => {
         let testDate = dataList.map(item => item.createdAt)
 
         // Set data untuk chart
-        setChartSeries([{ name: 'Suhu', data: testValue }])
+        setChartSeries([{ name: sensorName, data: testValue }])
         setChartCategories(testDate)
 
-        // Set waktu dan temperatur terbaru
+        // Set waktu dan nilai sensor terbaru
         setCurrentTime(`${result.latest.date} ${result.latest.time}`)
-        setCurrentTemp(result.latest.value)
+        setCurrentValue(result.latest.value)
+        setCurrentUnit(result.sensor.unit)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }, 500)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [sensorTopic])
 
   // Konfigurasi opsi chart dengan gradasi warna terbalik
+  // Konfigurasi opsi chart dengan warna tema "Info"
   const options = {
     chart: {
       parentHeightOffset: 0,
@@ -63,8 +70,7 @@ const ApexTemperatureChart = () => {
     stroke: {
       show: true,
       curve: 'smooth', // Garis lebih halus
-      width: 3,
-      colors: ['#FF4C51'] // Warna garis merah
+      width: 2,
     },
     legend: {
       position: 'top',
@@ -77,15 +83,35 @@ const ApexTemperatureChart = () => {
       },
       itemMargin: { horizontal: 9 }
     },
-    colors: ['#FF9F43'], // Warna bawah (oranye)
+    theme: {
+      monochrome: {
+        enabled: true,
+        shadeTo: 'light',
+        shadeIntensity: 1,
+        color: infoColor
+      }
+    },
     fill: {
       type: 'gradient',
       gradient: {
-        shade: 'light',
-        type: 'vertical', // Membuat gradasi dari bawah ke atas
+        opacityTo: 0,
+        opacityFrom: 1,
         shadeIntensity: 1,
-        gradientToColors: ['#FF4C51'], // Warna atas (merah)
-        stops: [100, 50, 0] // Membalikkan gradasi
+        stops: [0, 100],
+        colorStops: [
+          [
+            {
+              offset: 0,
+              opacity: 0.4,
+              color: infoColor
+            },
+            {
+              opacity: 0,
+              offset: 100,
+              color: 'var(--mui-palette-background-paper)'
+            }
+          ]
+        ]
       }
     },
     grid: {
@@ -96,14 +122,14 @@ const ApexTemperatureChart = () => {
       }
     },
     yaxis: {
-      min: 0, // Tetapkan minimum pada 0 °C
-      max: 100, // Tetapkan maksimum pada 100 °C
+      min: chartMin,
+      max: chartMax,
       tickAmount: 5,
       labels: {
         style: { colors: textDisabled, fontSize: '13px' }
       },
       title: {
-        text: 'Suhu (°C)',
+        text: `${sensorName} ${currentUnit}`,
         style: { color: textDisabled }
       }
     },
@@ -118,19 +144,20 @@ const ApexTemperatureChart = () => {
       },
       categories: chartCategories
     }
-  }
+  };
+
 
   return (
     <Card>
       <CardHeader
-        title='Simulasi Suhu'
+        title={sensorName}
         subheader='Data diperbarui setiap 500ms'
         action={
           <Box sx={{ textAlign: 'right', ml: 'auto' }}>
             <Typography variant='body2'>{currentTime}</Typography>
-            {currentTemp !== null && (
+            {currentValue !== null && (
               <Typography variant='h5' sx={{ mt: 0.5 }}>
-                {currentTemp} °C
+                {currentValue} {currentUnit}
               </Typography>
             )}
           </Box>
@@ -155,4 +182,4 @@ const ApexTemperatureChart = () => {
   )
 }
 
-export default ApexTemperatureChart
+export default ApexAreaChart

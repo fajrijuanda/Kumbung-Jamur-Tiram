@@ -5,9 +5,6 @@ CREATE TYPE "Role" AS ENUM ('ADMIN', 'USER');
 CREATE TYPE "Activity" AS ENUM ('ON', 'OFF', 'FADE_IN', 'FADE_OUT', 'BRIGHTNESS_UP', 'BRIGHTNESS_DOWN');
 
 -- CreateEnum
-CREATE TYPE "TypeSensor" AS ENUM ('AIR_TEMPERATURE', 'MEDIA_TEMPERATURE', 'AIR_HUMIDITY', 'MEDIA_HUMIDITY', 'CO2_LEVEL', 'O2_LEVEL', 'UV_INDEX', 'PH');
-
--- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 
 -- CreateEnum
@@ -82,9 +79,9 @@ CREATE TABLE "Kumbung" (
 CREATE TABLE "Sensor" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "unit" TEXT NOT NULL,
     "description" TEXT,
     "location" TEXT NOT NULL,
-    "types" "TypeSensor"[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "kumbungId" INTEGER NOT NULL,

@@ -53,6 +53,10 @@ export async function GET(req) {
   }));
 
   const data = {
+    sensor: {
+      unit: sensor.unit,
+      name: sensor.name
+    },
     dataList: formattedData.reverse(), // Urutkan dari data terlama ke terbaru
     latest: {
       time: latestTime,

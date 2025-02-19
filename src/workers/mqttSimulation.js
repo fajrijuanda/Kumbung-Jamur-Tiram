@@ -10,9 +10,9 @@ const sensors = [
     { topic: "sensor/kelembaban_udara", min: 40, max: 80 },
     { topic: "sensor/UV", min: 0, max: 11 },
     { topic: "sensor/O2", min: 19, max: 22 },
-    { topic: "sensor/CO2", min: 300, max: 800 },
+    { topic: "sensor/CO2", min: 0, max: 10000 },
     { topic: "sensor/pH", min: 5.5, max: 7.5 },
-    { topic: "sensor/suhu_media", min: 18, max: 30 },
+    { topic: "sensor/suhu_media", min: 40, max: 60 },
     { topic: "sensor/kelembaban_media", min: 30, max: 70 }
 ];
 
