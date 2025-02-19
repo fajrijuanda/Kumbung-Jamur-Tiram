@@ -55,7 +55,7 @@ client.on('message', async (topic, message) => {
             // Check if the sensor exists in the database
             let sensor = await prisma.sensor.findFirst({
                 where: {
-                    name: topic, // Nama sensor yang ingin dicari berdasarkan topic
+                    topic: topic,
                 },
             });
 

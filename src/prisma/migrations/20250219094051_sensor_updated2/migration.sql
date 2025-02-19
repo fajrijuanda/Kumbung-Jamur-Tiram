@@ -79,6 +79,7 @@ CREATE TABLE "Kumbung" (
 CREATE TABLE "Sensor" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "topic" TEXT NOT NULL,
     "unit" TEXT NOT NULL,
     "description" TEXT,
     "location" TEXT NOT NULL,

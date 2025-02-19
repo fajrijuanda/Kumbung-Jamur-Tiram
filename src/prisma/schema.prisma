@@ -77,15 +77,16 @@ enum Role {
 }
 
 model Sensor {
-    id          Int          @id @default(autoincrement())
+    id          Int        @id @default(autoincrement())
     name        String
-    unit      String
+    topic       String
+    unit        String
     description String?
     location    String
-    createdAt   DateTime     @default(now())
-    updatedAt   DateTime     @updatedAt
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
     kumbungId   Int
-    kumbung     Kumbung      @relation(fields: [kumbungId], references: [id], onDelete: Cascade)
+    kumbung     Kumbung    @relation(fields: [kumbungId], references: [id], onDelete: Cascade)
     data        Data[]
     actuator    Actuator[]
 }

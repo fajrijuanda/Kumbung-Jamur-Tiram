@@ -33,7 +33,7 @@ const ApexAreaChart = ({ sensorName, sensorTopic, chartColor, chartMin, chartMax
     const interval = setInterval(async () => {
       try {
         // Gunakan prop sensorName secara dinamis
-        const res = await fetch(`/api/sensors?name=${sensorTopic}`)
+        const res = await fetch(`/api/sensors?topic=${sensorTopic}`)
         const result = await res.json()
         let dataList = result.dataList
 

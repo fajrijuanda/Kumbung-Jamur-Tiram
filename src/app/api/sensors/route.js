@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  const name = searchParams.get('name');
+  const topic = searchParams.get('topic');
 
   let sensor = await prisma.sensor.findFirst({
     where: {
-      name: name
+      topic: topic
     },
   });
 
