@@ -35,7 +35,10 @@ const ApexCharts = () => {
           for more details.
         </Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
+        <ApexAreaChart />
+      </Grid>
+      <Grid item xs={12} md={6}>
         <ApexAreaChart />
       </Grid>
       <Grid item xs={12}>

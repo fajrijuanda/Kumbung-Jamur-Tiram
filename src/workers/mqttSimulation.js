@@ -6,7 +6,7 @@ const client = mqtt.connect(brokerUrl);
 
 // Daftar topik sensor
 const sensors = [
-    { topic: "sensor/suhu_udara", min: 20, max: 35 },
+    { topic: "sensor/suhu_udara", min: 35.0, max: 40.0 },
     { topic: "sensor/kelembaban_udara", min: 40, max: 80 },
     { topic: "sensor/UV", min: 0, max: 11 },
     { topic: "sensor/O2", min: 19, max: 22 },
