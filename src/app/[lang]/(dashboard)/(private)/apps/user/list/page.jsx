@@ -1,30 +1,33 @@
 // Component Imports
 import UserList from '@views/apps/user/list'
 
-// Data Imports
-import { getUserData } from '@/app/server/actions'
-
-/**
- * ! If you need data using an API call, uncomment the below API code, update the `process.env.API_URL` variable in the
- * ! `.env` file found at root of your project and also update the API endpoints like `/apps/user-list` in below example.
- * ! Also, remove the above server action import and the action itself from the `src/app/server/actions.ts` file to clean up unused code
- * ! because we've used the server action for getting our static data.
- */
-/* const getUserData = async () => {
-  // Vars
-  const res = await fetch(`${process.env.API_URL}/apps/user-list`)
-
+// Fungsi untuk mengambil data user dari API
+const getUserData = async () => {
+  const res = await fetch("http://localhost:3000/api/apps/user-list")
+  
   if (!res.ok) {
     throw new Error('Failed to fetch userData')
   }
 
   return res.json()
-} */
+}
+
 const UserListApp = async () => {
-  // Vars
+  // Mengambil data dari API
   const data = await getUserData()
 
-  return <UserList userData={data} />
+  /*const mappedData = data.users.map(user => ({
+    id: user.id,
+    fullName: user.name, // mapping API "name" to "fullName"
+    username: user.email, // for example, using email as username
+    avatar: user.image,
+    role: user.roles?.[0] || 'USER', // default role if none exists
+    currentPlan: 'Basic', // set a default plan or map from your API if available
+    billing: '$0', // set billing info as needed
+    status: user.emailVerified ? 'active' : 'pending'
+  }))*/
+
+  return <UserList userData={data.users} />
 }
 
 export default UserListApp
