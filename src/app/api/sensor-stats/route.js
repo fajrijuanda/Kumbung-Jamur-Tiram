@@ -9,10 +9,6 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    let totalSensorsTable = await prisma.sensor.count();
-    let activeSensors = 0;
-
-    // Ambil data sensor sesuai seleksi field yang diinginkan
     // Check if the kumbung exists in the database
     let kumbung = await prisma.kumbung.findFirst({
       where: {
@@ -25,20 +21,47 @@ export async function GET() {
     }
 
     // Check if the sensor exists in the database
-    let sensor = await prisma.sensor.findMany({
+    let sensors = await prisma.sensor.findMany({
       where: {
-        kumbungId: kumbung.id
+        kumbungId: kumbung.id,
+      },
+      include: {
+        data: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: {
+            createdAt: true,
+          },
+        },
       },
     });
 
     // If sensor does not exist, create it
-    if (!sensor) {
+    if (!sensors) {
       throw "Sensor Not Found";
     }
 
-    // Kembalikan respon JSON dengan data yang diinginkan
+    // Get the current time and calculate one minute ago
+    const now = new Date();
+    const oneMinuteAgo = new Date(now.getTime() - 60 * 1000);
+
+    // Filter sensors that have a latest data record within the last minute
+    const activeSensorsList = sensors.filter(sensor => {
+      // Check if there is at least one data record
+      if (sensor.data && sensor.data.length > 0) {
+        const lastDataTime = new Date(sensor.data[0].createdAt);
+        return lastDataTime > oneMinuteAgo;
+      }
+      return false;
+    });
+
+    // Final data
+    const totalSensors = sensors.length;
+    const activeSensors = activeSensorsList.length;
+
+    // Return
     return NextResponse.json({
-      totalSensorsTable: totalSensorsTable || 0,
+      totalSensors: totalSensors || 0,
       activeSensors: activeSensors || 0
     }, {
       status: 200

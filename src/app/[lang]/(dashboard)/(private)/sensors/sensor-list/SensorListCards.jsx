@@ -19,18 +19,13 @@ const UserListCards = () => {
 
   const fetchSensorStats = async () => {
     try {
-      console.log('🔄 Fetching sensor stats...')
       const res = await fetch('/api/sensor-stats')
-
       if (!res.ok) throw new Error(`Failed to fetch sensor stats: ${res.status}`)
-
       const data = await res.json()
 
-      console.log('📊 Data dari API:', data)
-
       setStats({
-        totalSensors: data.totalSensors || 0, // Dari database
-        activeSensors: data.activeSensors || 0 // Dari tabel `Data`
+        totalSensors: data.totalSensors,
+        activeSensors: data.activeSensors
       })
     } catch (error) {
       console.error('❌ Error fetching sensor stats:', error)
@@ -46,7 +41,7 @@ const UserListCards = () => {
       stats: loading ? 'Loading...' : stats.totalSensors,
       avatarIcon: 'tabler-database',
       avatarColor: 'primary',
-      trend: 'neutral',
+      trend: null,
       subtitle: 'Jumlah Sensor Terdaftar di Database'
     },
     {
@@ -54,8 +49,8 @@ const UserListCards = () => {
       stats: loading ? 'Loading...' : stats.activeSensors,
       avatarIcon: 'tabler-device-analytics',
       avatarColor: 'success',
-      trend: 'neutral',
-      subtitle: 'Sensor dengan Data dalam 5 Menit Terakhir'
+      trend: null,
+      subtitle: 'Sensor dengan Data dalam 1 Menit Terakhir'
     }
   ]
 
