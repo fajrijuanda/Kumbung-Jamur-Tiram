@@ -16,7 +16,7 @@ import { useTheme } from '@mui/material/styles'
 const API_BASE = 'https://ibnux.github.io/data-indonesia/'
 
 const AddSensorDrawer = ({ open, handleClose, setData }) => {
-  const theme = useTheme() // 🔥 Dapatkan tema saat ini (Light/Dark Mode)
+  const theme = useTheme()
 
   // **Gunakan warna berdasarkan tema**
   const customSelectStyles = {
@@ -46,26 +46,11 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
       color: theme.palette.mode === 'dark' ? '#FFF' : '#000'
     })
   }
-  // State untuk lokasi
-  const [provinces, setProvinces] = useState([])
-  const [kabupaten, setKabupaten] = useState([])
-  const [kecamatan, setKecamatan] = useState([])
-  const [kelurahan, setKelurahan] = useState([])
+
+  // State untuk Kumbung & Alamat
   const [kumbungs, setKumbungs] = useState([])
-
-  const [selectedProvinsi, setSelectedProvinsi] = useState(null)
-  const [selectedKabupaten, setSelectedKabupaten] = useState(null)
-  const [selectedKecamatan, setSelectedKecamatan] = useState(null)
-  const [selectedKelurahan, setSelectedKelurahan] = useState(null)
-  const [selectedKumbung, setSelectedKumbung] = useState(null)
+  const [selectedKumbung, setSelectedKumbung] = useState(null) // ✅ Menambahkan state yang hilang
   const [alamatDetail, setAlamatDetail] = useState('')
-
-  // Fetch Data Provinsi
-  useEffect(() => {
-    fetch(`${API_BASE}provinsi.json`)
-      .then(res => res.json())
-      .then(data => setProvinces(data.map(p => ({ value: p.id, label: p.nama }))))
-  }, [])
 
   // Fetch Data Kumbung dari Database
   useEffect(() => {
@@ -73,33 +58,6 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
       .then(res => res.json())
       .then(data => setKumbungs(data.map(k => ({ value: k.id, label: k.name }))))
   }, [])
-
-  // Fetch Data Kabupaten Berdasarkan Provinsi
-  useEffect(() => {
-    if (selectedProvinsi) {
-      fetch(`${API_BASE}kabupaten/${selectedProvinsi.value}.json`)
-        .then(res => res.json())
-        .then(data => setKabupaten(data.map(k => ({ value: k.id, label: k.nama }))))
-    }
-  }, [selectedProvinsi])
-
-  // Fetch Data Kecamatan Berdasarkan Kabupaten
-  useEffect(() => {
-    if (selectedKabupaten) {
-      fetch(`${API_BASE}kecamatan/${selectedKabupaten.value}.json`)
-        .then(res => res.json())
-        .then(data => setKecamatan(data.map(kec => ({ value: kec.id, label: kec.nama }))))
-    }
-  }, [selectedKabupaten])
-
-  // Fetch Data Kelurahan Berdasarkan Kecamatan
-  useEffect(() => {
-    if (selectedKecamatan) {
-      fetch(`${API_BASE}kelurahan/${selectedKecamatan.value}.json`)
-        .then(res => res.json())
-        .then(data => setKelurahan(data.map(kel => ({ value: kel.id, label: kel.nama }))))
-    }
-  }, [selectedKecamatan])
 
   // Form Handling
   const {
@@ -117,14 +75,7 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
   })
 
   const onSubmit = async data => {
-    if (
-      !selectedKumbung ||
-      !selectedProvinsi ||
-      !selectedKabupaten ||
-      !selectedKecamatan ||
-      !selectedKelurahan ||
-      !alamatDetail
-    ) {
+    if (!selectedKumbung || !alamatDetail) {
       Swal.fire({
         title: 'Error!',
         text: 'Harap lengkapi semua informasi lokasi.',
@@ -134,14 +85,12 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
       return
     }
 
-    const location = `${alamatDetail}, ${selectedKelurahan.label}, ${selectedKecamatan.label}, ${selectedKabupaten.label}, ${selectedProvinsi.label}`
-
     const newSensor = {
       name: data.name,
       topic: data.topic,
       unit: data.unit,
       description: data.description,
-      location,
+      location: alamatDetail,
       kumbungId: selectedKumbung.value
     }
 
@@ -157,16 +106,12 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
       const savedSensor = await response.json()
       setData(prevData => [...prevData, savedSensor])
 
-      // 🔥 **Reset Form Setelah Submit**
-      reset() // Reset semua input di form
-      setSelectedProvinsi(null)
-      setSelectedKabupaten(null)
-      setSelectedKecamatan(null)
-      setSelectedKelurahan(null)
-      setSelectedKumbung(null)
+      // **Reset Form Setelah Submit**
+      reset()
       setAlamatDetail('')
+      setSelectedKumbung(null)
 
-      // 🔥 **SweetAlert Konfirmasi Sukses**
+      // **SweetAlert Konfirmasi Sukses**
       Swal.fire({
         title: 'Success!',
         text: 'Sensor berhasil ditambahkan!',
@@ -174,7 +119,7 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
         confirmButtonText: 'OK'
       })
 
-      // 🔥 **Tutup Drawer Secara Otomatis Setelah 1 Detik**
+      // **Tutup Drawer Secara Otomatis Setelah 1 Detik**
       setTimeout(() => {
         handleClose()
       }, 1000)
@@ -244,6 +189,8 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
             <CustomTextField {...field} fullWidth label='Description' placeholder='Sensor for monitoring temperature' />
           )}
         />
+
+        {/* 🔥 Select Kumbung */}
         <Select
           styles={customSelectStyles}
           options={kumbungs}
@@ -251,41 +198,12 @@ const AddSensorDrawer = ({ open, handleClose, setData }) => {
           onChange={setSelectedKumbung}
           placeholder='Pilih Kumbung'
         />
-        <Select
-          styles={customSelectStyles}
-          options={provinces}
-          value={selectedProvinsi}
-          onChange={setSelectedProvinsi}
-          placeholder='Pilih Provinsi'
-        />
-        <Select
-          styles={customSelectStyles}
-          options={kabupaten}
-          value={selectedKabupaten}
-          onChange={setSelectedKabupaten}
-          placeholder='Pilih Kabupaten'
-          isDisabled={!selectedProvinsi}
-        />
-        <Select
-          styles={customSelectStyles}
-          options={kecamatan}
-          value={selectedKecamatan}
-          onChange={setSelectedKecamatan}
-          placeholder='Pilih Kecamatan'
-          isDisabled={!selectedKabupaten}
-        />
-        <Select
-          styles={customSelectStyles}
-          options={kelurahan}
-          value={selectedKelurahan}
-          onChange={setSelectedKelurahan}
-          placeholder='Pilih Kelurahan'
-          isDisabled={!selectedKecamatan}
-        />
+
+        {/* 🔥 Input Alamat Detail */}
         <CustomTextField
           fullWidth
-          label='Detail Alamat'
-          placeholder='PT .....'
+          label='Location'
+          placeholder=' .....'
           value={alamatDetail}
           onChange={e => setAlamatDetail(e.target.value)}
         />
