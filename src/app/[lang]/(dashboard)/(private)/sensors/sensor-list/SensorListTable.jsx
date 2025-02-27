@@ -126,15 +126,6 @@ const SensorListTable = () => {
           )
         }
       }),
-
-      // columnHelper.accessor('createdAt', {
-      //   header: 'Created At',
-      //   cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
-      // }),
-      // columnHelper.accessor('updatedAt', {
-      //   header: 'Update At',
-      //   cell: ({ row }) => new Date(row.original.updatedAt).toLocaleDateString()
-      // }),
       {
         id: 'action',
         header: 'Action',
@@ -249,7 +240,6 @@ const SensorListTable = () => {
         sensorData={selectedSensor}
         fetchSensors={fetchSensors}
       />
-      ;
     </Card>
   )
 }
