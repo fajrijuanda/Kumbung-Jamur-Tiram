@@ -51,7 +51,7 @@ CREATE TABLE "User" (
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "roles" "Role"[],
+    "role" "Role" NOT NULL DEFAULT 'USER',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -68,6 +68,7 @@ CREATE TABLE "Kumbung" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "location" TEXT,
     "userId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -103,7 +104,7 @@ CREATE TABLE "Data" (
 -- CreateTable
 CREATE TABLE "Actuator" (
     "id" SERIAL NOT NULL,
-    "activities" "Activity"[],
+    "activity" "Activity" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "sensorId" INTEGER NOT NULL,
@@ -117,8 +118,8 @@ CREATE TABLE "Payment" (
     "userId" INTEGER NOT NULL,
     "kumbungId" INTEGER NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
-    "method" "PaymentMethod"[],
-    "status" "PaymentStatus"[],
+    "method" "PaymentMethod" NOT NULL,
+    "status" "PaymentStatus" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -130,7 +131,7 @@ CREATE TABLE "Subscription" (
     "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
     "planId" INTEGER NOT NULL,
-    "status" "SubscriptionStatus"[],
+    "status" "SubscriptionStatus" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

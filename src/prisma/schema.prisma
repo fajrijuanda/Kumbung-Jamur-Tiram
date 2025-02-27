@@ -44,7 +44,7 @@ model User {
     image         String?
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @default(now()) @updatedAt
-    roles         Role[]
+    role          Role      @default(USER)
     accounts      Account[]
     sessions      Session[]
     kumbung       Kumbung[]
@@ -63,6 +63,7 @@ model Kumbung {
     id          Int       @id @default(autoincrement())
     name        String
     description String?
+    location    String?
     userId      Int
     user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt   DateTime  @default(now())
@@ -101,7 +102,7 @@ model Data {
 
 model Actuator {
     id         Int        @id @default(autoincrement())
-    activities Activity[]
+    activity Activity
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @updatedAt
     sensorId   Int
@@ -122,8 +123,8 @@ model Payment {
     userId    Int
     kumbungId Int
     amount    Float
-    method    PaymentMethod[]
-    status    PaymentStatus[]
+    method    PaymentMethod
+    status    PaymentStatus
     createdAt DateTime        @default(now())
     updatedAt DateTime        @updatedAt
     user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -146,7 +147,7 @@ model Subscription {
     id        Int                  @id @default(autoincrement())
     userId    String
     planId    Int
-    status    SubscriptionStatus[]
+    status    SubscriptionStatus
     createdAt DateTime             @default(now())
     updatedAt DateTime             @updatedAt
     plan      Plan                 @relation(fields: [planId], references: [id], onDelete: Cascade)
