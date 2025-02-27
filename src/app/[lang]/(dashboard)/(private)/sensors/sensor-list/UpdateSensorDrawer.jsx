@@ -12,9 +12,8 @@ import { useForm, Controller } from 'react-hook-form';
 import CustomTextField from '@core/components/mui/TextField';
 import { useTheme } from '@mui/material/styles';
 
-const UpdateSensorDrawer = ({ open, handleClose, sensorData, setData }) => {
+const UpdateSensorDrawer = ({ open, handleClose, sensorData, fetchSensors }) => {
   const theme = useTheme();
-
   const customSelectStyles = {
     control: styles => ({
       ...styles,
@@ -27,13 +26,21 @@ const UpdateSensorDrawer = ({ open, handleClose, sensorData, setData }) => {
   const [kumbungs, setKumbungs] = useState([]);
   const [selectedKumbung, setSelectedKumbung] = useState(null);
 
+  const { control, reset, handleSubmit } = useForm({
+    defaultValues: {
+      name: '',
+      topic: '',
+      unit: '',
+      description: ''
+    }
+  });
+
   useEffect(() => {
     fetch('/api/kumbung')
       .then(res => res.json())
       .then(data => {
         const kumbungOptions = data.map(k => ({ value: k.id, label: k.name }));
         setKumbungs(kumbungOptions);
-
         if (sensorData?.kumbungId) {
           const foundKumbung = kumbungOptions.find(k => k.value === sensorData.kumbungId);
           setSelectedKumbung(foundKumbung || null);
@@ -42,30 +49,27 @@ const UpdateSensorDrawer = ({ open, handleClose, sensorData, setData }) => {
       .catch(error => console.error('❌ Error Fetching Kumbung:', error));
   }, [sensorData]);
 
-  const { control, reset, handleSubmit, formState: { errors } } = useForm();
-
   useEffect(() => {
     if (sensorData) {
-      console.log('🔹 Data Sensor yang diterima:', sensorData);
-
       reset({
         name: sensorData.name || '',
         topic: sensorData.topic || '',
         unit: sensorData.unit || '',
         description: sensorData.description || ''
       });
+
+      if (sensorData.kumbungId) {
+        const foundKumbung = kumbungs.find(k => k.value === sensorData.kumbungId);
+        setSelectedKumbung(foundKumbung || null);
+      }
     }
-  }, [sensorData, reset]);
+  }, [sensorData, reset, kumbungs]);
 
   const onSubmit = async data => {
-    console.log('🟢 Data yang akan dikirim:', {
-      id: sensorData.id,
-      name: data.name,
-      topic: data.topic,
-      unit: data.unit,
-      description: data.description,
-      kumbungId: selectedKumbung ? selectedKumbung.value : sensorData.kumbungId
-    });
+    if (!sensorData?.id) {
+      Swal.fire({ title: "Error!", text: "Data sensor tidak ditemukan!", icon: "error", confirmButtonText: "OK" });
+      return;
+    }
 
     const updatedSensor = {
       name: data.name,
@@ -83,19 +87,17 @@ const UpdateSensorDrawer = ({ open, handleClose, sensorData, setData }) => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text(); // Debug response
-        console.error("❌ Error Update:", errorText);
-        throw new Error(`Gagal memperbarui sensor. Server mengembalikan: ${errorText}`);
+        const errorText = await response.text();
+        throw new Error(`Gagal memperbarui sensor: ${errorText}`);
       }
 
-      const result = await response.json(); // ✅ Simpan response JSON dalam variabel
-
-      setData(prevData => prevData.map(sensor => (sensor.id === result.id ? result : sensor)));
+      await fetchSensors(); // 🔥 Fetch data ulang setelah update berhasil
 
       Swal.fire({ title: "Success!", text: "Sensor berhasil diperbarui!", icon: "success", confirmButtonText: "OK" });
 
       setTimeout(() => {
-        handleClose();
+        setSelectedKumbung(null);
+        handleClose(); // 🔥 Tutup drawer setelah sukses
       }, 1000);
     } catch (error) {
       console.error("❌ Error Update:", error);
@@ -103,15 +105,8 @@ const UpdateSensorDrawer = ({ open, handleClose, sensorData, setData }) => {
     }
   };
 
-
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 350, sm: 450, md: 500 } } }}
-      onClose={handleClose}
-    >
+    <Drawer open={open} anchor='right' onClose={handleClose}>
       <div className='flex items-center justify-between p-5'>
         <Typography variant='h5'>Update Sensor</Typography>
         <IconButton size='small' onClick={handleClose}>
@@ -120,37 +115,12 @@ const UpdateSensorDrawer = ({ open, handleClose, sensorData, setData }) => {
       </div>
       <Divider />
       <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6 p-6'>
-        <Controller
-          name='name'
-          control={control}
-          render={({ field }) => <CustomTextField {...field} fullWidth label='Sensor Name' />}
-        />
-        <Controller
-          name='topic'
-          control={control}
-          render={({ field }) => <CustomTextField {...field} fullWidth label='MQTT Topic' />}
-        />
-        <Controller
-          name='unit'
-          control={control}
-          render={({ field }) => <CustomTextField {...field} fullWidth label='Unit' />}
-        />
-        <Controller
-          name='description'
-          control={control}
-          render={({ field }) => <CustomTextField {...field} fullWidth label='Description' />}
-        />
-
-        <Select
-          styles={customSelectStyles}
-          options={kumbungs}
-          value={selectedKumbung}
-          onChange={setSelectedKumbung}
-          placeholder='Pilih Kumbung'
-        />
-        <Button variant='contained' type='submit'>
-          Update
-        </Button>
+        <Controller name='name' control={control} render={({ field }) => <CustomTextField {...field} fullWidth label='Sensor Name' />} />
+        <Controller name='topic' control={control} render={({ field }) => <CustomTextField {...field} fullWidth label='MQTT Topic' />} />
+        <Controller name='unit' control={control} render={({ field }) => <CustomTextField {...field} fullWidth label='Unit' />} />
+        <Controller name='description' control={control} render={({ field }) => <CustomTextField {...field} fullWidth label='Description' />} />
+        <Select styles={customSelectStyles} options={kumbungs} value={selectedKumbung} onChange={setSelectedKumbung} placeholder='Pilih Kumbung' />
+        <Button variant='contained' type='submit'>Update</Button>
       </form>
     </Drawer>
   );

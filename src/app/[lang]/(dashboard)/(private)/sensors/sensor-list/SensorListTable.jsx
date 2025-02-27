@@ -39,27 +39,19 @@ const SensorListTable = () => {
     fetchSensors()
   }, [])
 
+  // 🔥 Gunakan useEffect untuk update tampilan setelah data berubah
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredData(data)
-    } else {
-      setFilteredData(
-        data.filter(
-          sensor =>
-            sensor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            sensor.topic.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      )
-    }
-  }, [searchQuery, data])
+    setFilteredData(data)
+  }, [data])
 
   const fetchSensors = async () => {
     try {
       const res = await fetch('/api/sensor-list')
       if (!res.ok) throw new Error('Failed to fetch sensors')
       const sensors = await res.json()
-      setData(sensors)
-      setFilteredData(sensors)
+
+      setData(sensors) // 🔥 Perbarui data sensor di state utama
+      setFilteredData(sensors) // 🔥 Pastikan filteredData juga diperbarui
     } catch (error) {
       console.error('Error fetching sensors:', error)
     } finally {
@@ -79,12 +71,27 @@ const SensorListTable = () => {
     }).then(async result => {
       if (result.isConfirmed) {
         try {
-          await fetch('/api/sensor-list', {
+          const res = await fetch('/api/sensor-list', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id })
           })
-          setData(data.filter(sensor => sensor.id !== id))
+
+          if (!res.ok) {
+            throw new Error('Failed to delete sensor')
+          }
+
+          const response = await res.json() // Ambil response dari API
+
+          // 🔥 **Pastikan API benar-benar menghapus sensor sebelum update state**
+          console.log('🔥 API Response after delete:', response)
+
+          // 🔥 **Ambil ulang data sensor setelah delete**
+          await fetchSensors()
+
+          // 🔥 **Hanya update state jika masih ada sensor**
+          setData(prevData => (prevData.length > 1 ? prevData.filter(sensor => sensor.id !== id) : []))
+
           Swal.fire('Deleted!', 'The sensor has been deleted.', 'success')
         } catch (error) {
           console.error('Error deleting sensor:', error)
@@ -240,7 +247,7 @@ const SensorListTable = () => {
         open={updateSensorOpen}
         handleClose={() => setUpdateSensorOpen(false)}
         sensorData={selectedSensor}
-        setData={setData}
+        fetchSensors={fetchSensors}
       />
       ;
     </Card>
