@@ -15,21 +15,9 @@ import { useForm, Controller } from 'react-hook-form'
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 
-// Vars
-const initialData = {
-  company: '',
-  country: '',
-  contact: ''
-}
-
 const AddUserDrawer = props => {
-  // Props
   const { open, handleClose, userData, setData } = props
 
-  // States
-  const [formData, setFormData] = useState(initialData)
-
-  // Hooks
   const {
     control,
     reset: resetForm,
@@ -37,40 +25,52 @@ const AddUserDrawer = props => {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      fullName: '',
-      username: '',
+      name: '',
       email: '',
       role: '',
-      plan: '',
-      status: ''
+      image: ''
     }
   })
 
-  const onSubmit = data => {
-    const newUser = {
-      id: (userData?.length && userData?.length + 1) || 1,
-      avatar: `/images/avatars/${Math.floor(Math.random() * 8) + 1}.png`,
-      fullName: data.fullName,
-      username: data.username,
+  const onSubmit = async data => {
+    // Siapkan payload untuk API
+    const payload = {
+      name: data.name,
       email: data.email,
       role: data.role,
-      currentPlan: data.plan,
-      status: data.status,
-      company: formData.company,
-      country: formData.country,
-      contact: formData.contact,
-      billing: userData?.[Math.floor(Math.random() * 50) + 1].billing ?? 'Auto Debit'
+      image: data.image
+        ? data.image
+        : `/images/avatars/${Math.floor(Math.random() * 8) + 1}.png`
     }
 
-    setData([...(userData ?? []), newUser])
-    handleClose()
-    setFormData(initialData)
-    resetForm({ fullName: '', username: '', email: '', role: '', plan: '', status: '' })
+    try {
+      const response = await fetch('http://localhost:3000/api/apps/user-list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) {
+        console.error('Gagal menambahkan user')
+        return
+      }
+
+      const result = await response.json()
+
+      // Update state dengan user baru dari API
+      setData([...(userData || []), result.user])
+
+      // Tutup drawer dan reset form
+      handleClose()
+      resetForm()
+    } catch (error) {
+      console.error('Error:', error)
+    }
   }
 
   const handleReset = () => {
     handleClose()
-    setFormData(initialData)
+    resetForm()
   }
 
   return (
@@ -90,35 +90,24 @@ const AddUserDrawer = props => {
       </div>
       <Divider />
       <div>
-        <form onSubmit={handleSubmit(data => onSubmit(data))} className='flex flex-col gap-6 p-6'>
+        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6 p-6'>
+          {/* Name */}
           <Controller
-            name='fullName'
+            name='name'
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
               <CustomTextField
                 {...field}
                 fullWidth
-                label='Full Name'
+                label='Name'
                 placeholder='John Doe'
-                {...(errors.fullName && { error: true, helperText: 'This field is required.' })}
+                {...(errors.name && { error: true, helperText: 'This field is required.' })}
               />
             )}
           />
-          <Controller
-            name='username'
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <CustomTextField
-                {...field}
-                fullWidth
-                label='Username'
-                placeholder='johndoe'
-                {...(errors.username && { error: true, helperText: 'This field is required.' })}
-              />
-            )}
-          />
+
+          {/* Email */}
           <Controller
             name='email'
             control={control}
@@ -134,6 +123,8 @@ const AddUserDrawer = props => {
               />
             )}
           />
+
+          {/* Role */}
           <Controller
             name='role'
             control={control}
@@ -142,93 +133,35 @@ const AddUserDrawer = props => {
               <CustomTextField
                 select
                 fullWidth
-                id='select-role'
                 label='Select Role'
                 {...field}
                 {...(errors.role && { error: true, helperText: 'This field is required.' })}
               >
-                <MenuItem value='admin'>Admin</MenuItem>
-                <MenuItem value='author'>Author</MenuItem>
-                <MenuItem value='editor'>Editor</MenuItem>
-                <MenuItem value='maintainer'>Maintainer</MenuItem>
-                <MenuItem value='subscriber'>Subscriber</MenuItem>
+                <MenuItem value='USER'>USER</MenuItem>
+                <MenuItem value='ADMIN'>ADMIN</MenuItem>
               </CustomTextField>
             )}
           />
+
+          {/* Image (opsional) */}
           <Controller
-            name='plan'
+            name='image'
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <CustomTextField
-                select
-                fullWidth
-                id='select-plan'
-                label='Select Plan'
                 {...field}
-                inputProps={{ placeholder: 'Select Plan' }}
-                {...(errors.plan && { error: true, helperText: 'This field is required.' })}
-              >
-                <MenuItem value='basic'>Basic</MenuItem>
-                <MenuItem value='company'>Company</MenuItem>
-                <MenuItem value='enterprise'>Enterprise</MenuItem>
-                <MenuItem value='team'>Team</MenuItem>
-              </CustomTextField>
+                fullWidth
+                label='Image URL'
+                placeholder='https://example.com/image.jpg'
+              />
             )}
           />
-          <Controller
-            name='status'
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <CustomTextField
-                select
-                fullWidth
-                id='select-status'
-                label='Select Status'
-                {...field}
-                {...(errors.status && { error: true, helperText: 'This field is required.' })}
-              >
-                <MenuItem value='pending'>Pending</MenuItem>
-                <MenuItem value='active'>Active</MenuItem>
-                <MenuItem value='inactive'>Inactive</MenuItem>
-              </CustomTextField>
-            )}
-          />
-          <CustomTextField
-            label='Company'
-            fullWidth
-            placeholder='Company PVT LTD'
-            value={formData.company}
-            onChange={e => setFormData({ ...formData, company: e.target.value })}
-          />
-          <CustomTextField
-            select
-            fullWidth
-            id='country'
-            value={formData.country}
-            onChange={e => setFormData({ ...formData, country: e.target.value })}
-            label='Select Country'
-            inputProps={{ placeholder: 'Country' }}
-          >
-            <MenuItem value='India'>India</MenuItem>
-            <MenuItem value='USA'>USA</MenuItem>
-            <MenuItem value='Australia'>Australia</MenuItem>
-            <MenuItem value='Germany'>Germany</MenuItem>
-          </CustomTextField>
-          <CustomTextField
-            label='Contact'
-            type='number'
-            fullWidth
-            placeholder='(397) 294-5153'
-            value={formData.contact}
-            onChange={e => setFormData({ ...formData, contact: e.target.value })}
-          />
+
           <div className='flex items-center gap-4'>
             <Button variant='contained' type='submit'>
               Submit
             </Button>
-            <Button variant='tonal' color='error' type='reset' onClick={() => handleReset()}>
+            <Button variant='tonal' color='error' type='reset' onClick={handleReset}>
               Cancel
             </Button>
           </div>

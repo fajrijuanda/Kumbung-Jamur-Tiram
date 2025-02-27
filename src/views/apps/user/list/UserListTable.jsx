@@ -111,21 +111,15 @@ const UserListTable = ({ tableData }) => {
         header: 'Image',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            {row.original.image ? (
-              <CustomAvatar src={row.original.image} size={34} />
-            ) : (
-              <p>None</p>
-            )}
+            <CustomAvatar src={row.original.image || ''} size={34} />
           </div>
         )
       }),
-      columnHelper.accessor('roles', {
-        header: 'Roles',
+      columnHelper.accessor('role', {
+        header: 'Role',
         cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {Array.isArray(row.original.roles)
-              ? row.original.roles.join(', ')
-              : row.original.roles}
+          <Typography color='text.primary'>
+            {row.original.role}
           </Typography>
         )
       }),
