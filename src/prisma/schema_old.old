@@ -1,0 +1,146 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-arm64-openssl-1.1.x", "rhel-openssl-3.0.x"]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String? // 🔹 Tambahkan field password
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  kumbungs      Kumbung[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Kumbung {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  type        String
+  userId      String
+  location    String
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sensors Sensor[]
+}
+
+model Sensor {
+  id        String  @id @default(cuid())
+  kumbungId String
+  name      String
+  isActive  Boolean
+
+  kumbung   Kumbung    @relation(fields: [kumbungId], references: [id], onDelete: Cascade)
+  data      Data[]
+  aktuators Aktuator[]
+}
+
+model Data {
+  id        String   @id @default(cuid())
+  sensorId  String
+  typeData  String
+  value     String
+  timestamp DateTime
+
+  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+}
+
+model Aktuator {
+  id       String @id @default(cuid())
+  sensorId String
+  activity String
+
+  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  userId        String
+  kumbungId     String
+  date          DateTime
+  ammount       Int
+  paymentMethod PaymentMethod
+  status        PaymentStatus
+}
+
+enum PaymentStatus {
+  pending
+  completed
+}
+
+enum PaymentMethod {
+  Test
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Activity {
+  ON
+  OFF
+  FADE_IN
+  FADE_OUT
+  BRIGHTNESS_UP
+  BRIGHTNESS_DOWN
+}
+
+enum TypeSensor {
+  AIR_TEMPERATURE
+  MEDIA_TEMPERATURE
+  AIR_HUMIDITY
+  MEDIA_HUMIDITY
+  CO2_LEVEL
+  O2_LEVEL
+  UV_INDEX
+  PH
+}
