@@ -22,7 +22,7 @@ const ApexCharts = () => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <Typography variant='h4'>Stream</Typography>
+      <Typography variant='h4'>Realtime Sensor - Data Bulanan</Typography>
         {/* <Typography>
           <code>react-apexcharts</code> is a third-party library. Please refer to its{' '}
           <Link
@@ -37,28 +37,64 @@ const ApexCharts = () => {
         </Typography> */}
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'Suhu Udara'} sensorTopic={'sensor/suhu_udara'} chartColor='warning' chartMin={0} chartMax={100} />
+        <ApexAreaChart
+          sensorName={'Suhu Udara'}
+          sensorTopic={'sensor/suhu_udara'}
+          chartColor='warning'
+          chartMin={0}
+          chartMax={100}
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'Suhu Media'} sensorTopic={'sensor/suhu_media'} chartColor='error' chartMin={0} chartMax={100}/>
+        <ApexAreaChart sensorName={'Gas'} sensorTopic={'sensor/gas'} chartColor='info' chartMin={0} chartMax={5000} />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'Kelembaban Udara'} sensorTopic={'sensor/kelembaban_udara'} chartColor='info' chartMin={0} chartMax={100}/>
+        <ApexAreaChart
+          sensorName={'Kelembaban Udara'}
+          sensorTopic={'sensor/kelembaban_udara'}
+          chartColor='info'
+          chartMin={0}
+          chartMax={100}
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'Kelembaban Media'} sensorTopic={'sensor/kelembaban_media'} chartColor='primary' chartMin={0} chartMax={100}/>
+        <ApexAreaChart
+          sensorName={'Kelembaban Tanah'}
+          sensorTopic={'sensor/soil_moisture'}
+          chartColor='primary'
+          chartMin={0}
+          chartMax={100}
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'O2'} sensorTopic={'sensor/O2'} chartColor='success' chartMin={0} chartMax={100}/>
+        <ApexAreaChart sensorName={'O2'} sensorTopic={'sensor/O2'} chartColor='warning' chartMin={0} chartMax={100} />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'CO2'} sensorTopic={'sensor/CO2'} chartColor='secondary' chartMin={0} chartMax={10000}/>
+        <ApexAreaChart
+          sensorName={'Kondusivitas Tanah'}
+          sensorTopic={'sensor/soil_conductivity'}
+          chartColor='success'
+          chartMin={0}
+          chartMax={9999}
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'UV'} sensorTopic={'sensor/UV'} chartColor='primary' chartMin={0} chartMax={11}/>
+        <ApexAreaChart
+          sensorName={'pH Tanah'}
+          sensorTopic={'sensor/soil_ph'}
+          chartColor='primary'
+          chartMin={0}
+          chartMax={50}
+        />
       </Grid>
       <Grid item xs={12} md={6}>
-        <ApexAreaChart sensorName={'pH'} sensorTopic={'sensor/pH'} chartColor='info' chartMin={0} chartMax={10}/>
+        <ApexAreaChart
+          sensorName={'Suhu Tanah'}
+          sensorTopic={'sensor/soil_temperature'}
+          chartColor='info'
+          chartMin={0}
+          chartMax={99}
+        />
       </Grid>
     </Grid>
   )

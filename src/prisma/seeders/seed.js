@@ -1,13 +1,11 @@
-const {
-  PrismaClient
-} = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
 async function main() {
   // Optionally, clear existing sensor data before seeding
-  //await prisma.sensor.deleteMany();
+  // await prisma.sensor.deleteMany();
 
   const hashedPassword = await bcrypt.hash('testmail123', 10);
 
@@ -25,51 +23,19 @@ async function main() {
       userId: user.id
     },
   });
-
-  const sensors = [{
-      name: 'Suhu Udara',
-      topic: "sensor/suhu_udara",
-      unit: "°C"
-    },
-    {
-      name: 'Kelembaban Udara',
-      topic: "sensor/kelembaban_udara",
-      unit: "%"
-    },
-    {
-      name: 'UV',
-      topic: "sensor/UV",
-      unit: "index"
-    },
-    {
-      name: 'O2',
-      topic: "sensor/O2",
-      unit: "%"
-    },
-    {
-      name: 'CO2',
-      topic: "sensor/CO2",
-      unit: "ppm"
-    },
-    {
-      name: 'pH',
-      topic: "sensor/pH",
-      unit: "pH"
-    },
-    {
-      name: 'Suhu Media',
-      topic: "sensor/suhu_media",
-      unit: "°C"
-    },
-    {
-      name: 'Kelembaban Media',
-      topic: "sensor/kelembaban_media",
-      unit: "%"
-    }
+  const sensors = [
+    { name: 'Suhu Udara', topic: "sensor/suhu_udara", unit: "°C", type: "temperature" },
+    { name: 'Kelembaban Udara', topic: "sensor/kelembaban_udara", unit: "%", type: "humidity" },
+    { name: 'Gas', topic: "sensor/gas", unit: "ppm", type: "gas" },
+    { name: 'O2', topic: "sensor/O2", unit: "%", type: "o2" },
+    { name: 'Kelembaban Tanah', topic: "sensor/soil_moisture", unit: "%", type: "soilMoisture" },
+    { name: 'pH Tanah', topic: "sensor/soil_ph", unit: "pH", type: "soilPH" },
+    { name: 'Suhu Tanah', topic: "sensor/soil_temperature", unit: "°C", type: "soilTemp" },
+    { name: 'Kondusivitas Tanah', topic: "sensor/soil_conductivity", unit: "µS/cm", type: "soilConductivity" }
   ];
 
   for (let i = 0; i < sensors.length; i++) {
-    let sensor = sensors[i]
+    let sensor = sensors[i];
 
     await prisma.sensor.create({
       data: {
@@ -78,6 +44,7 @@ async function main() {
         location: 'test',
         description: 'test',
         unit: sensor.unit,
+        type: sensor.type, // Menambahkan type di sini
         kumbungId: kumbung.id,
       },
     });
